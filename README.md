@@ -1,4 +1,4 @@
 WorkRecorderVSIX
 ================
 
-Work Recorder extenstion for VS2010
+Work Recorder extension for VS2010
