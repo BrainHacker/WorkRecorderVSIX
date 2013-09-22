@@ -18,12 +18,6 @@ namespace Community.WorkRecorder
 {
     class Recorder
     {
-        private enum OperationType
-        {
-            SetPosition = 1,
-            WriteString = 2,
-        };
-
         private int pos = 0;
 
         private String buffer;
@@ -46,8 +40,7 @@ namespace Community.WorkRecorder
 
         public void onTextChanged(ITextChange change)
         {
-            int currentPos = change.NewPosition;
-            
+            int currentPos = change.NewPosition;            
             if (currentPos != pos)
             {
                 setNewCursorPosition(currentPos);
@@ -77,7 +70,7 @@ namespace Community.WorkRecorder
             // flush current buffer
             writeString();
 
-            writer.Write((byte)OperationType.SetPosition);
+            writer.Write((byte)OperationCode.SetCursorPosition);
             writer.Write(currentPos);
 
             pos = currentPos;
@@ -88,7 +81,7 @@ namespace Community.WorkRecorder
             int length = buffer.Length;
             if (length != 0)
             {
-                writer.Write((byte)OperationType.WriteString);
+                writer.Write((byte)OperationCode.TypeString);
                 writer.Write(length);
 
                 char[] symbols = buffer.ToArray();
