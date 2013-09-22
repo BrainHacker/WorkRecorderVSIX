@@ -70,8 +70,8 @@ namespace Community.WorkRecorder
             // flush current buffer
             writeString();
 
-            writer.Write((byte)OperationCode.SetCursorPosition);
-            writer.Write(currentPos);
+            OpCodeSetCursorPosition opCode = new OpCodeSetCursorPosition((uint)currentPos);
+            opCode.serialize(writer);
 
             pos = currentPos;
         }
@@ -81,11 +81,8 @@ namespace Community.WorkRecorder
             int length = buffer.Length;
             if (length != 0)
             {
-                writer.Write((byte)OperationCode.TypeString);
-                writer.Write(length);
-
-                char[] symbols = buffer.ToArray();
-                writer.Write(symbols);
+                OpCodeTypeString opCode = new OpCodeTypeString(buffer);
+                opCode.serialize(writer);
 
                 buffer = "";
             }
