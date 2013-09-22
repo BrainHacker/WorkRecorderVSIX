@@ -38,20 +38,38 @@ namespace Community.WorkRecorder
     {
         private IWpfTextView textView;
         internal IOleCommandTarget nextFilter;
-
-        private bool listenMode;
+        
+        //private bool listenMode;
         private Recorder recorder;
+
+        private string recordFullPath = "";
 
         internal CommandFilter(IVsTextView textViewAdapter, IWpfTextView textView)
         {
             recorder = new Recorder();
-            listenMode = true;
+            //listenMode = true;
 
             this.textView = textView;
             textViewAdapter.AddCommandFilter(this, out nextFilter);
 
             ITextBuffer buffer = this.textView.TextBuffer;
             buffer.Changed += new EventHandler<TextContentChangedEventArgs>(bufferChanged);
+
+            // trying to get document path from TextBuffer
+            ITextDocument document;
+            var result = buffer.Properties.TryGetProperty<ITextDocument>(
+                typeof(ITextDocument), out document);
+
+            if ( result )
+            {
+                string documentFullPath = document.FilePath;
+                recordFullPath = documentFullPath + ".rec";
+            }
+            else
+            {
+                // TODO: save to some folder
+                recordFullPath = "document.rec";
+            }
         }
 
         ~CommandFilter()
@@ -64,28 +82,13 @@ namespace Community.WorkRecorder
             INormalizedTextChangeCollection changeCollection = args.Changes;
             foreach ( ITextChange change in changeCollection)
             {
-                //log.WriteLine("Delta = {0}", change.Delta);
-                //log.WriteLine("LineCountDelta = {0}", change.LineCountDelta);
-                //log.WriteLine("NewEnd = {0}", change.NewEnd);
-                //log.WriteLine("NewLength = {0}", change.NewLength);
-                //log.WriteLine("NewPosition = {0}", change.NewPosition);
-                //log.WriteLine("NewSpan = {0}", change.NewSpan);
-                //log.WriteLine("NewText = {0}", change.NewText);
-                //log.WriteLine("OldEnd = {0}", change.OldEnd);
-                //log.WriteLine("OldLength = {0}", change.OldLength);
-                //log.WriteLine("OldPosition = {0}", change.OldPosition);
-                //log.WriteLine("OldSpan = {0}", change.OldSpan);
-                //log.WriteLine("OldText = {0}", change.OldText);
-                //log.WriteLine("=====================================");
-
                 recorder.onTextChanged(change);
             }
-            //log.Flush();
         }
 
         void saveRecord()
         {
-            var log = new FileStream("work_log.rec", FileMode.OpenOrCreate, FileAccess.Write);
+            var log = new FileStream(recordFullPath, FileMode.OpenOrCreate, FileAccess.Write);
             recorder.flush(log);
             log.Flush();
         }
