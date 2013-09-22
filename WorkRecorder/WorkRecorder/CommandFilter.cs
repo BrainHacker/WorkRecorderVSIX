@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using System.IO;
 using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
@@ -37,13 +38,13 @@ namespace Community.WorkRecorder
     {
         private IWpfTextView textView;
         internal IOleCommandTarget nextFilter;
-        bool listenMode;
 
-        System.IO.TextWriter log;
+        private bool listenMode;
+        private Recorder recorder;
 
         internal CommandFilter(IVsTextView textViewAdapter, IWpfTextView textView)
         {
-            log = new System.IO.StreamWriter("work_log.txt");
+            recorder = new Recorder();
             listenMode = true;
 
             this.textView = textView;
@@ -53,25 +54,39 @@ namespace Community.WorkRecorder
             buffer.Changed += new EventHandler<TextContentChangedEventArgs>(bufferChanged);
         }
 
+        ~CommandFilter()
+        {
+            saveRecord();
+        }
+
         void bufferChanged(object sender, TextContentChangedEventArgs args)
         {
             INormalizedTextChangeCollection changeCollection = args.Changes;
             foreach ( ITextChange change in changeCollection)
             {
-                log.WriteLine("Delta = {0}", change.Delta);
-                log.WriteLine("LineCountDelta = {0}", change.LineCountDelta);
-                log.WriteLine("NewEnd = {0}", change.NewEnd);
-                log.WriteLine("NewLength = {0}", change.NewLength);
-                log.WriteLine("NewPosition = {0}", change.NewPosition);
-                log.WriteLine("NewSpan = {0}", change.NewSpan);
-                log.WriteLine("NewText = {0}", change.NewText);
-                log.WriteLine("OldEnd = {0}", change.OldEnd);
-                log.WriteLine("OldLength = {0}", change.OldLength);
-                log.WriteLine("OldPosition = {0}", change.OldPosition);
-                log.WriteLine("OldSpan = {0}", change.OldSpan);
-                log.WriteLine("OldText = {0}", change.OldText);
-                log.WriteLine("=====================================");
+                //log.WriteLine("Delta = {0}", change.Delta);
+                //log.WriteLine("LineCountDelta = {0}", change.LineCountDelta);
+                //log.WriteLine("NewEnd = {0}", change.NewEnd);
+                //log.WriteLine("NewLength = {0}", change.NewLength);
+                //log.WriteLine("NewPosition = {0}", change.NewPosition);
+                //log.WriteLine("NewSpan = {0}", change.NewSpan);
+                //log.WriteLine("NewText = {0}", change.NewText);
+                //log.WriteLine("OldEnd = {0}", change.OldEnd);
+                //log.WriteLine("OldLength = {0}", change.OldLength);
+                //log.WriteLine("OldPosition = {0}", change.OldPosition);
+                //log.WriteLine("OldSpan = {0}", change.OldSpan);
+                //log.WriteLine("OldText = {0}", change.OldText);
+                //log.WriteLine("=====================================");
+
+                recorder.onTextChanged(change);
             }
+            //log.Flush();
+        }
+
+        void saveRecord()
+        {
+            var log = new FileStream("work_log.rec", FileMode.OpenOrCreate, FileAccess.Write);
+            recorder.flush(log);
             log.Flush();
         }
 
