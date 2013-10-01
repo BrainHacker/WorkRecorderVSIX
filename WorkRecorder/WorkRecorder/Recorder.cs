@@ -20,17 +20,13 @@ namespace Community.WorkRecorder
     {
         private int pos = 0;
 
-        private String buffer;
+        private string buffer;
         private MemoryStream output;
         private BinaryWriter writer;
 
         public Recorder()
         {
-            pos = 0;
-
-            buffer = "";
-            output = new MemoryStream();
-            writer = new BinaryWriter(output);
+            init("");
         }
 
         ~Recorder()
@@ -38,21 +34,43 @@ namespace Community.WorkRecorder
             writeString();
         }
 
+        public void init(string text)
+        {
+            pos = 0;
+
+            buffer = "";
+            output = new MemoryStream();
+            writer = new BinaryWriter(output);
+
+            if (text.Length != 0)
+            {
+                OpCodeInsertString opCode = new OpCodeInsertString(text);
+                opCode.serialize(writer);
+            }
+        }
+
         public void onTextChanged(ITextChange change)
         {
             int currentPos = change.NewPosition;            
             if (currentPos != pos)
             {
+                writeString();
                 setNewCursorPosition(currentPos);
             }
 
             String newText = change.NewText;
             String oldText = change.OldText;
 
-            if (oldText.Length == 0 && newText.Length != 0)
+            if (oldText.Length == 0)
             {
                 buffer += newText;
                 pos    += newText.Length;
+
+                if (pos != change.NewEnd)
+                {
+                    writeString();
+                    setNewCursorPosition(change.NewEnd);
+                }
             }
         }
 

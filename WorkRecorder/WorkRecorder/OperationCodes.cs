@@ -16,6 +16,18 @@ namespace Community.WorkRecorder
         SetCursorPosition = 0,
 
         /// <summary>
+        /// Insert whole string.
+        /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
+        /// </summary>
+        InsertString,
+
+        /// <summary>
+        /// Remove whole string.
+        /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
+        /// </summary>
+        RemoveString,
+        
+        /// <summary>
         /// Normal typing.
         /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
         /// </summary>
@@ -24,13 +36,13 @@ namespace Community.WorkRecorder
         /// TODO: Erasing string using Backspace key (opposite to TypeString).
         /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
         /// </summary>
-        BackspaceString,
+        UntypeString,
 
         /// <summary>
         /// TODO: Erasing string using Delete key.
         /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
         /// </summary>
-        DeleteString,
+        PullString,
         /// <summary>
         /// TODO: Type string without changing cursor position (opposite to DeleteString).
         /// <para>Format: operation code (1 byte), string length (4 bytes), raw string data (char[]).</para>
@@ -92,6 +104,7 @@ namespace Community.WorkRecorder
         {
             writer.Write((byte)getOpCode());
             writer.Write(position);
+            writer.Write((byte)OperationCode.DelimiterFlag);
         }
     };
 
@@ -117,6 +130,36 @@ namespace Community.WorkRecorder
 
             char[] symbols = buffer.ToCharArray();
             writer.Write(symbols);
+
+            writer.Write((byte)OperationCode.DelimiterFlag);
+        }
+    };
+
+    /// <summary>
+    /// Class for OperationCode.InsertString
+    /// </summary>
+    internal class OpCodeInsertString : OpCodeStringBased
+    {
+        public OpCodeInsertString() : base() { }
+        public OpCodeInsertString(string value) : base(value) { }
+
+        public override OperationCode getOpCode()
+        {
+            return OperationCode.InsertString;
+        }
+    };
+
+    /// <summary>
+    /// Class for OperationCode.RemoveString
+    /// </summary>
+    internal class OpCodeRemoveString : OpCodeStringBased
+    {
+        public OpCodeRemoveString() : base() { }
+        public OpCodeRemoveString(string value) : base(value) { }
+
+        public override OperationCode getOpCode()
+        {
+            return OperationCode.RemoveString;
         }
     };
 
@@ -135,30 +178,30 @@ namespace Community.WorkRecorder
     };
 
     /// <summary>
-    /// Class for OperationCode.BackspaceString
+    /// Class for OperationCode.UntypeString
     /// </summary>
-    internal class OpCodeBackspaceString : OpCodeStringBased
+    internal class OpCodeUntypeString : OpCodeStringBased
     {
-        public OpCodeBackspaceString() : base() { }
-        public OpCodeBackspaceString(string value) : base(value) { }
+        public OpCodeUntypeString() : base() { }
+        public OpCodeUntypeString(string value) : base(value) { }
 
         public override OperationCode getOpCode()
         {
-            return OperationCode.BackspaceString;
+            return OperationCode.UntypeString;
         }
     };
 
     /// <summary>
-    /// Class for OperationCode.DeleteString
+    /// Class for OperationCode.PullString
     /// </summary>
-    internal class OpCodeDeleteString : OpCodeStringBased
+    internal class OpCodePullString : OpCodeStringBased
     {
-        public OpCodeDeleteString() : base() { }
-        public OpCodeDeleteString(string value) : base(value) { }
+        public OpCodePullString() : base() { }
+        public OpCodePullString(string value) : base(value) { }
 
         public override OperationCode getOpCode()
         {
-            return OperationCode.DeleteString;
+            return OperationCode.PullString;
         }
     };
 
@@ -202,6 +245,7 @@ namespace Community.WorkRecorder
         {
             writer.Write((byte)getOpCode());
             writer.Write(time);
+            writer.Write((byte)OperationCode.DelimiterFlag);
         }
     };
 
@@ -217,6 +261,7 @@ namespace Community.WorkRecorder
         public override void serialize(BinaryWriter writer)
         {
             writer.Write((byte)getOpCode());
+            writer.Write((byte)OperationCode.DelimiterFlag);
         }
     };
 
@@ -233,17 +278,18 @@ namespace Community.WorkRecorder
         }
     };
 
-    /// <summary>
-    /// Class for OperationCode.DelimiterFlag
-    /// </summary>
-    internal class OpCodeDelimiterFlag : OpCodeSimple
-    {
-        public OpCodeDelimiterFlag() : base() { }
-
-        public override OperationCode getOpCode()
-        {
-            return OperationCode.DelimiterFlag;
-        }
-    };
+    // This is just flag, not operation
+    // /// <summary>
+    // /// Class for OperationCode.DelimiterFlag
+    // /// </summary>
+    // internal class OpCodeDelimiterFlag : OpCodeSimple
+    // {
+    //     public OpCodeDelimiterFlag() : base() { }
+    // 
+    //     public override OperationCode getOpCode()
+    //     {
+    //         return OperationCode.DelimiterFlag;
+    //     }
+    // };
 
 } //namespace Community.WorkRecorder

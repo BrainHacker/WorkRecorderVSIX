@@ -70,6 +70,8 @@ namespace Community.WorkRecorder
                 // TODO: save to some folder
                 recordFullPath = "document.rec";
             }
+
+            startRecording();
         }
 
         ~CommandFilter()
@@ -77,7 +79,16 @@ namespace Community.WorkRecorder
             saveRecord();
         }
 
-        void bufferChanged(object sender, TextContentChangedEventArgs args)
+        private void startRecording()
+        {
+            ITextBuffer buffer = textView.TextBuffer;
+            ITextSnapshot snapshot = buffer.CurrentSnapshot;
+
+            string currentText = snapshot.GetText();
+            recorder.init(currentText);
+        }
+
+        private void bufferChanged(object sender, TextContentChangedEventArgs args)
         {
             INormalizedTextChangeCollection changeCollection = args.Changes;
             foreach ( ITextChange change in changeCollection)
@@ -86,9 +97,11 @@ namespace Community.WorkRecorder
             }
         }
 
-        void saveRecord()
+        private void saveRecord()
         {
             var log = new FileStream(recordFullPath, FileMode.OpenOrCreate, FileAccess.Write);
+            log.SetLength(0);
+
             recorder.flush(log);
             log.Flush();
         }
@@ -102,37 +115,6 @@ namespace Community.WorkRecorder
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID,
             uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            //char typedChar = char.MinValue;
-
-            ////if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
-            ////{
-            ////    typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-            ////    log.WriteByte((byte)typedChar);
-            ////}
-
-            //if (pguidCmdGroup == VSConstants.VSStd2K
-            //    && nCmdID <= (uint)VSConstants.VSStd2KCmdID.END_EXT)
-            //{
-            //    if (listenMode)
-            //    {
-            //        if (pvaIn != IntPtr.Zero)
-            //        {
-            //            typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-            //            log.WriteLine("cmdId = {0}, value = {1}", nCmdID, typedChar);
-            //        }
-            //        else
-            //        {
-            //            log.WriteLine("cmdId = {0}", nCmdID);
-            //        }
-
-            //        log.Flush();
-            //    }
-            //    else
-            //    {
-            //        // TODO: send to text editor
-            //    }
-            //}
-
             return nextFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
     }
