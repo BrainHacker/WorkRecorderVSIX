@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable language="en-us" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+
+  <!-- Extern headers -->
+  <Extern href="vsshlids.h"/>
+
+  <!-- Commands section -->
+  <Commands package="guidRecorderPackage">
+
+    <Groups>
+      <Group guid="guidShowWorkRecorder" id="MenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+      </Group>      
+    </Groups>
+
+    <Buttons>      
+      <Button guid="guidShowWorkRecorder" id="cmdidShowWorkRecorderWindowCommand" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <!--Icon guid="guidImages" id="bmpPic2" /-->
+        <Strings>
+          <CommandName>cmdidShowRecorderControlCommand</CommandName>
+          <ButtonText>Work Recorder</ButtonText>
+        </Strings>
+      </Button>      
+    </Buttons>
+    
+  </Commands>
+
+  <!-- Symbols section -->
+  <Symbols>
+    
+    <!-- Package GUID -->
+    <GuidSymbol name="guidRecorderPackage" value="{78bdc9f1-2810-4189-9ca7-7af7bca5101b}" />
+
+    <!-- Menu Group -->
+    <GuidSymbol name="guidShowWorkRecorder" value="{2d760672-e494-4717-9e74-460a3b247fee}">
+      <IDSymbol name="MenuGroup" value="0x1000" />
+      <IDSymbol name="cmdidShowWorkRecorderWindowCommand" value="0x1001" />
+    </GuidSymbol>
+    
+  </Symbols>
+  
+</CommandTable>

@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.Text;
 //using Microsoft.VisualStudio.TextManager.Interop;
 //using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Community.WorkRecorder
+namespace Community.WorkRecorder.Engine
 {
     class Recorder
     {

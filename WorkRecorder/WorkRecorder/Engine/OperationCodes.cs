@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Community.WorkRecorder
+namespace Community.WorkRecorder.Engine
 {
     /// <summary>
     /// Enumeration of supported operations codes and they brief description

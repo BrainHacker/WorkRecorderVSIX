@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Community.WorkRecorder
+namespace Community.WorkRecorder.Engine
 {
     [Export(typeof(IVsTextViewCreationListener))]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
