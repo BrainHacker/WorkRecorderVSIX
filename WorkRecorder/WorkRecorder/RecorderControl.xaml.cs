@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Community.WorkRecorder
 {
     /// <summary>
-    /// Interaction logic for MyControl.xaml
+    /// Interaction logic for RecorderControl.xaml
     /// </summary>
-    public partial class MyControl : UserControl
+    public partial class RecorderControl : UserControl
     {
-        public MyControl()
+        public RecorderControl()
         {
             InitializeComponent();
         }
