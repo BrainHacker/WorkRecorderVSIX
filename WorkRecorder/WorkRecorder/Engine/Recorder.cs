@@ -18,24 +18,32 @@ namespace Community.WorkRecorder.Engine
 {
     class Recorder
     {
+        private bool recordingInProgress = false;
+
         private int pos = 0;
 
         private string buffer;
         private MemoryStream output;
         private BinaryWriter writer;
+        private string recordFullPath;
 
         public Recorder()
         {
-            init("");
         }
 
         ~Recorder()
         {
-            writeString();
+            if (recordingInProgress)
+            {
+                uninit();
+            }
         }
 
-        public void init(string text)
+        public void init(string text, string recordFullPath)
         {
+            recordingInProgress = true;
+            this.recordFullPath = recordFullPath;
+
             pos = 0;
 
             buffer = "";
@@ -49,27 +57,48 @@ namespace Community.WorkRecorder.Engine
             }
         }
 
+        public void uninit()
+        {
+            recordingInProgress = false;
+
+            var recordFile = new FileStream(recordFullPath, FileMode.OpenOrCreate, FileAccess.Write);
+            recordFile.SetLength(0);
+
+            writeString();
+            flush(recordFile);
+
+            recordFile.Flush();
+        }
+
+        public bool isRecording()
+        {
+            return recordingInProgress;
+        }
+
         public void onTextChanged(ITextChange change)
         {
-            int currentPos = change.NewPosition;            
-            if (currentPos != pos)
+            if (recordingInProgress)
             {
-                writeString();
-                setNewCursorPosition(currentPos);
-            }
-
-            String newText = change.NewText;
-            String oldText = change.OldText;
-
-            if (oldText.Length == 0)
-            {
-                buffer += newText;
-                pos    += newText.Length;
-
-                if (pos != change.NewEnd)
+                int currentPos = change.NewPosition;
+                if (currentPos != pos)
                 {
                     writeString();
-                    setNewCursorPosition(change.NewEnd);
+                    setNewCursorPosition(currentPos);
+                }
+
+                String newText = change.NewText;
+                String oldText = change.OldText;
+
+                if (oldText.Length == 0)
+                {
+                    buffer += newText;
+                    pos += newText.Length;
+
+                    if (pos != change.NewEnd)
+                    {
+                        writeString();
+                        setNewCursorPosition(change.NewEnd);
+                    }
                 }
             }
         }

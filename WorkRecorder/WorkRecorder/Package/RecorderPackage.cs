@@ -20,6 +20,7 @@ namespace Community.WorkRecorder.VsPackage
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(GUI.RecorderWindow))]
+    [ProvideToolWindowVisibilityAttribute(typeof(GUI.RecorderWindow), UIContextGuids.SolutionExists)]
     [Guid(GuidList.guidRecorderPackageString)]
     public sealed class RecorderPackage : Package
     {

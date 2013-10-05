@@ -9,9 +9,11 @@
              Name="MyToolWindow"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}">This is a toolwindow with WPF content</TextBlock>
-            <Button Content="_Click Me!" Width="80" Height="80" Name="button1" Click="button1_Click" />
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="92*" />
+            <RowDefinition Height="208*" />
+        </Grid.RowDefinitions>
+        <Button MinWidth="100" MinHeight="30" Margin="10" Padding="10"
+                 Content="Rec" Name="recordButton" Click="onRecordButtonClick" />
     </Grid>
 </UserControl>

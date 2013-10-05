@@ -29,7 +29,7 @@ namespace Community.WorkRecorder.Engine
             IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);
             if (textView != null)
             {
-                var filter = new CommandFilter(textViewAdapter, textView);
+                new CommandFilter(textViewAdapter, textView);
             }
         }
     }
@@ -39,28 +39,27 @@ namespace Community.WorkRecorder.Engine
         private IWpfTextView textView;
         internal IOleCommandTarget nextFilter;
         
-        //private bool listenMode;
-        private Recorder recorder;
+        private bool listening = false;
 
+        private Recorder recorder;
         private string recordFullPath = "";
 
         internal CommandFilter(IVsTextView textViewAdapter, IWpfTextView textView)
         {
             recorder = new Recorder();
-            //listenMode = true;
+            listening = false;
 
             this.textView = textView;
             textViewAdapter.AddCommandFilter(this, out nextFilter);
 
-            ITextBuffer buffer = this.textView.TextBuffer;
-            buffer.Changed += new EventHandler<TextContentChangedEventArgs>(bufferChanged);
-
             // trying to get document path from TextBuffer
+            ITextBuffer buffer = this.textView.TextBuffer;
             ITextDocument document;
+
             var result = buffer.Properties.TryGetProperty<ITextDocument>(
                 typeof(ITextDocument), out document);
 
-            if ( result )
+            if (result)
             {
                 string documentFullPath = document.FilePath;
                 recordFullPath = documentFullPath + ".rec";
@@ -71,21 +70,68 @@ namespace Community.WorkRecorder.Engine
                 recordFullPath = "document.rec";
             }
 
-            startRecording();
+            // subscribe to RecorderControl event
+            RecorderControl.RecordStateChanged += new EventHandler<RecordStateChangedArgs>(OnRecordStateChanged);
         }
 
         ~CommandFilter()
         {
-            saveRecord();
         }
 
-        private void startRecording()
+        public void OnRecordStateChanged(object sender, RecordStateChangedArgs args)
         {
+            bool recording = args.Recording;
+            if (recording)
+            {
+                startListening();
+                initRecorder();
+            }
+            else
+            {
+                uninitRecorder();
+                stopListening();
+            }
+        }
+
+        private void startListening()
+        {
+            if (!listening)
+            {
+                listening = true;
+
+                ITextBuffer buffer = textView.TextBuffer;
+                buffer.Changed += new EventHandler<TextContentChangedEventArgs>(bufferChanged);
+            }
+        }
+
+        private void stopListening()
+        {
+            if (listening)
+            {
+                listening = false;
+
+                ITextBuffer buffer = textView.TextBuffer;
+                buffer.Changed -= new EventHandler<TextContentChangedEventArgs>(bufferChanged);
+            }
+        }
+
+        private void initRecorder()
+        {
+            uninitRecorder();
+
             ITextBuffer buffer = textView.TextBuffer;
             ITextSnapshot snapshot = buffer.CurrentSnapshot;
 
             string currentText = snapshot.GetText();
-            recorder.init(currentText);
+            recorder.init(currentText, recordFullPath);
+        }
+
+        private void uninitRecorder()
+        {
+            if (recorder.isRecording())
+            {
+                recorder.uninit();
+            }
         }
 
         private void bufferChanged(object sender, TextContentChangedEventArgs args)
@@ -95,15 +141,6 @@ namespace Community.WorkRecorder.Engine
             {
                 recorder.onTextChanged(change);
             }
-        }
-
-        private void saveRecord()
-        {
-            var log = new FileStream(recordFullPath, FileMode.OpenOrCreate, FileAccess.Write);
-            log.SetLength(0);
-
-            recorder.flush(log);
-            log.Flush();
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds,
