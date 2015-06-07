@@ -40,7 +40,10 @@ namespace Community.WorkRecorder
         private RecorderState state = RecorderState.Idle;
 
         private const string strStartRecording = "Start recording";
-        private const string strRecording = "Recording...";
+        private const string strRecordingInProgress = "Recording...";
+
+        private const string strPlayButtonPath = "..\\Resources\\Play_button.png";
+        private const string strStopButtonPath = "..\\Resources\\Stop_button.png";
 
         public RecorderControl()
         {
@@ -53,7 +56,8 @@ namespace Community.WorkRecorder
 
         private void Initialize()
         {
-            recordButton.Content = strStartRecording;
+            //recordButton.Content = strStartRecording;
+            changeRecordButton(strStartRecording, strPlayButtonPath);
             state = RecorderState.Idle;
         }
 
@@ -61,16 +65,24 @@ namespace Community.WorkRecorder
         {
             if (state == RecorderState.Idle)
             {
-                recordButton.Content = strRecording;
+                //recordButton.Content = strRecordingInProgress;
+                changeRecordButton(strRecordingInProgress, strStopButtonPath);
                 state = RecorderState.Recording;
             }
             else if (state == RecorderState.Recording)
             {
-                recordButton.Content = strStartRecording;
+                //recordButton.Content = strStartRecording;
+                changeRecordButton(strStartRecording, strPlayButtonPath);
                 state = RecorderState.Idle;
             }
 
             OnRecordStateChanged();
+        }
+
+        private void changeRecordButton(string label, string iconPath)
+        {
+            recordButtonText.Text = label;
+            recordButtonImage.Source = new BitmapImage(new Uri(iconPath, UriKind.Relative));
         }
 
         private void OnRecordStateChanged()

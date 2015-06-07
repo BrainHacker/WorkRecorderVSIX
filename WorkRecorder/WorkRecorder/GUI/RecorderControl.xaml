@@ -6,14 +6,18 @@
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Name="MyToolWindow"
-             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="92*" />
-            <RowDefinition Height="208*" />
-        </Grid.RowDefinitions>
-        <Button MinWidth="100" MinHeight="30" Margin="10" Padding="10"
-                 Content="Rec" Name="recordButton" Click="onRecordButtonClick" />
-    </Grid>
+             Name="WorkRecorderWindow"
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+             UseLayoutRounding="True">
+    <StackPanel Orientation="Vertical">
+        <Button Name="recordButton" Click="onRecordButtonClick"
+                Margin="20" Padding="8"
+                Height="50"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="recordButtonImage" RenderOptions.BitmapScalingMode="HighQuality" Source="..\Resources\Play_button.png" />
+                <TextBlock x:Name="recordButtonText" Padding="8" HorizontalAlignment="Center" VerticalAlignment="Center">Rec</TextBlock>
+            </StackPanel>
+        </Button>
+    </StackPanel>        
 </UserControl>

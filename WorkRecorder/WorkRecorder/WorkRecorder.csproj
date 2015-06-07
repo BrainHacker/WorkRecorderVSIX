@@ -171,9 +171,14 @@
       <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Play_button.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Package.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Stop_button.png" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
